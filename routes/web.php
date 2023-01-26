@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,10 +14,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+// Route::get('/home', 'Admin/HomeController@index')->name('home');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Qui dobbiamo creare un modo per gestire le rotte sotto autenticazione
+Route::middleware('auth')
+    ->namespace('Admin')
+    ->prefix('admin') //localhost:8080/admin/posts
+    ->name('admin.')
+    ->group(function(){
+        Route::get('/', 'HomeController@index')->name('index');
+        Route::resource('/posts', PostsController::class);
+});
+
+//Qui dobbiamo trovare un  modo per gestire tutte le rotte che non usano autenticazione
+
+Route::get('{any?}', function(){
+    return view('guest.home');
+})->where("any", ".*");
